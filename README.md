@@ -1,4 +1,4 @@
-jpath
+jPath
 =====
 
 * Java JSON path finder like XPath in XML.
