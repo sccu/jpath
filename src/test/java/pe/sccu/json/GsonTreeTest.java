@@ -10,11 +10,10 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import org.junit.rules.ExpectedException;
 
-public class JsonTreeTest {
+public class GsonTreeTest {
 
-    private JsonTree tree;
+    private JsonTree<JsonElement> tree;
 
     @Before
     public void before() {
