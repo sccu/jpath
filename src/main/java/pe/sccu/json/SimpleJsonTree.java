@@ -5,8 +5,8 @@ import org.json.simple.JSONObject;
 
 public class SimpleJsonTree extends JsonTree<Object> {
 
-    SimpleJsonTree(Object element) {
-        super(element);
+    SimpleJsonTree(Object element, boolean nullWhenNotFound) {
+        super(element, nullWhenNotFound);
     }
 
     @Override

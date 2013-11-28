@@ -15,7 +15,7 @@ public class SimpleJsonTreeTest {
     @Before
     public void before() {
         Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"jujang\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        tree = JsonTree.create(elem);
+        tree = new JsonTreeBuilder().create(elem);
     }
 
     @Test
@@ -35,13 +35,29 @@ public class SimpleJsonTreeTest {
         tree.find(".entries[2]");
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testWrongKey() {
-        assertNull(tree.find(".entries[1].gender"));
+        tree.find(".entries[1].gender");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMalformedPath() {
+        tree.find(".entries[a].gender");
     }
 
     @Test
     public void testFindWithKeyIncludingDot() {
         assertEquals("jujang", tree.find(".entries[0].pe\\.sccu").toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWhenNotFound() {
+        Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"jujang\" }, {\"name\":\"Bill\", \"age\":26}]}");
+        JsonTree<Object> aTree = new JsonTreeBuilder().nullWhenNotFound().create(elem);
+        assertNull(aTree.find(".entry"));
+        assertNull(aTree.find(".entries[2]"));
+        assertNull(aTree.find(".entries[1].gender"));
+
+        aTree.find(".entries[a].gender");
     }
 }

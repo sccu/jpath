@@ -4,8 +4,8 @@ import com.google.gson.JsonElement;
 
 public class GsonTree extends JsonTree<JsonElement> {
 
-    GsonTree(JsonElement element) {
-        super(element);
+    GsonTree(JsonElement element, boolean nullWhenNotFound) {
+        super(element, nullWhenNotFound);
     }
 
     @Override

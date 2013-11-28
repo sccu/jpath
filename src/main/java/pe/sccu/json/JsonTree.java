@@ -1,21 +1,15 @@
 package pe.sccu.json;
 
-import com.google.gson.JsonElement;
+import com.google.common.base.Preconditions;
 
 public abstract class JsonTree<T> {
 
-    protected T element;
+    private final boolean nullWhenNotFound;
+    protected final T element;
 
-    protected JsonTree(T element) {
+    protected JsonTree(T element, boolean nullWhenNotFound) {
         this.element = element;
-    }
-
-    public static JsonTree create(JsonElement element) {
-        return new GsonTree(element);
-    }
-
-    public static JsonTree create(Object element) {
-        return new SimpleJsonTree(element);
+        this.nullWhenNotFound = nullWhenNotFound;
     }
 
     private static Token getNextToken(String jpath, int start) {
@@ -30,14 +24,14 @@ public abstract class JsonTree<T> {
                 } else if (lookahead == '[') {
                     state = 4;
                 } else {
-                    throw new IllegalArgumentException("Path starts with '.' or '['.");
+                    throw new IllegalArgumentException("A path starts with '.' or '['.");
                 }
                 break;
             case 1:
                 if (Character.isAlphabetic(lookahead)) {
                     state = 2;
                 } else {
-                    throw new IllegalArgumentException("Invalid key character:" + lookahead);
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
                 break;
             case 2:
@@ -48,14 +42,14 @@ public abstract class JsonTree<T> {
                 } else if (lookahead == '.' || lookahead == '[') {
                     return new Token(Token.Type.OBJECT, jpath.substring(start + 1, next).replace("\\", ""), next);
                 } else {
-                    throw new IllegalArgumentException("Invalid key character:" + lookahead);
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
                 break;
             case 3:
                 if (lookahead == '.') {
                     state = 2;
                 } else {
-                    throw new IllegalArgumentException("Invalid key character:" + lookahead);
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
                 break;
             case 4:
@@ -64,7 +58,7 @@ public abstract class JsonTree<T> {
                 } else if (Character.isDigit(lookahead)) {
                     state = 7;
                 } else {
-                    throw new IllegalArgumentException("Invalid key character:" + lookahead);
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
                 break;
             case 5:
@@ -86,7 +80,7 @@ public abstract class JsonTree<T> {
                 } else if (Character.isDigit(lookahead)) {
                     state = 7;
                 } else {
-                    throw new IllegalArgumentException("Invalid key character:" + lookahead);
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
                 break;
             }
@@ -104,7 +98,21 @@ public abstract class JsonTree<T> {
     }
 
     public T find(String jpath) {
-        return find(element, jpath, 0);
+        try {
+            return Preconditions.checkNotNull(find(element, jpath, 0));
+        } catch (IndexOutOfBoundsException e) {
+            if (nullWhenNotFound) {
+                return null;
+            } else {
+                throw e;
+            }
+        } catch (NullPointerException e) {
+            if (nullWhenNotFound) {
+                return null;
+            } else {
+                throw new IllegalArgumentException("Invalid path:" + jpath);
+            }
+        }
     }
 
     private T find(T element, String jpath, int endIndex) {
@@ -150,6 +158,6 @@ public abstract class JsonTree<T> {
 
         public enum Type {
             OBJECT, EOP, ARRAY
-        };
+        }
     }
 }
