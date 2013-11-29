@@ -1,15 +1,17 @@
-package pe.sccu.json;
+package pe.sccu.tree;
 
-import com.google.common.base.Preconditions;
+public abstract class AbstractTreeSelector<T> {
 
-public abstract class JsonTree<T> {
-
-    private final boolean nullWhenNotFound;
+    private final boolean throwExceptionWhenNotFound;
     protected final T element;
 
-    protected JsonTree(T element, boolean nullWhenNotFound) {
+    protected AbstractTreeSelector(T element) {
+        this(element, false);
+    }
+
+    protected AbstractTreeSelector(T element, boolean throwExceptionWhenNotFound) {
         this.element = element;
-        this.nullWhenNotFound = nullWhenNotFound;
+        this.throwExceptionWhenNotFound = throwExceptionWhenNotFound;
     }
 
     private static Token getNextToken(String jpath, int start) {
@@ -99,18 +101,22 @@ public abstract class JsonTree<T> {
 
     public T find(String jpath) {
         try {
-            return Preconditions.checkNotNull(find(element, jpath, 0));
+            T result = find(element, jpath, 0);
+            if (result == null) {
+                throw new NullPointerException();
+            }
+            return result;
         } catch (IndexOutOfBoundsException e) {
-            if (nullWhenNotFound) {
-                return null;
-            } else {
+            if (throwExceptionWhenNotFound) {
                 throw e;
+            } else {
+                return null;
             }
         } catch (NullPointerException e) {
-            if (nullWhenNotFound) {
-                return null;
-            } else {
+            if (throwExceptionWhenNotFound) {
                 throw new IllegalArgumentException("Invalid path:" + jpath);
+            } else {
+                return null;
             }
         }
     }
@@ -119,9 +125,9 @@ public abstract class JsonTree<T> {
         Token t = getNextToken(jpath, endIndex);
         switch (t.getType()) {
         case ARRAY:
-            return find(getJsonArray(element, Integer.parseInt(t.getData())), jpath, t.getEndIndex());
+            return find(getByIndex(element, Integer.parseInt(t.getData())), jpath, t.getEndIndex());
         case OBJECT:
-            return find(getJsonObject(element, t.getData()), jpath, t.getEndIndex());
+            return find(getByName(element, t.getData()), jpath, t.getEndIndex());
         case EOP:
             return element;
         default:
@@ -129,9 +135,9 @@ public abstract class JsonTree<T> {
         }
     }
 
-    protected abstract T getJsonObject(T element, String key);
+    protected abstract T getByName(T element, String key);
 
-    protected abstract T getJsonArray(T element, int index);
+    protected abstract T getByIndex(T element, int index);
 
     private static class Token {
         private final Type type;

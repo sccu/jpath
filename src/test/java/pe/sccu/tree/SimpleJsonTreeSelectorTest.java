@@ -1,4 +1,4 @@
-package pe.sccu.json;
+package pe.sccu.tree;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -8,14 +8,14 @@ import org.json.simple.JSONValue;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimpleJsonTreeTest {
+public class SimpleJsonTreeSelectorTest {
 
-    private JsonTree<Object> tree;
+    private SimpleJsonTreeSelector tree;
 
     @Before
     public void before() {
         Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"jujang\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        tree = new JsonTreeBuilder().create(elem);
+        tree = new SimpleJsonTreeSelector(elem, true);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class SimpleJsonTreeTest {
     @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
         Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"jujang\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        JsonTree<Object> aTree = new JsonTreeBuilder().nullWhenNotFound().create(elem);
+        SimpleJsonTreeSelector aTree = new SimpleJsonTreeSelector(elem);
         assertNull(aTree.find(".entry"));
         assertNull(aTree.find(".entries[2]"));
         assertNull(aTree.find(".entries[1].gender"));
