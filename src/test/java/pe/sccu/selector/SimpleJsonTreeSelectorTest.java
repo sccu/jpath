@@ -1,4 +1,4 @@
-package pe.sccu.tree;
+package pe.sccu.selector;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -14,7 +14,7 @@ public class SimpleJsonTreeSelectorTest {
 
     @Before
     public void before() {
-        Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"jujang\" }, {\"name\":\"Bill\", \"age\":26}]}");
+        Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
         tree = new SimpleJsonTreeSelector(elem, true);
     }
 
@@ -47,12 +47,12 @@ public class SimpleJsonTreeSelectorTest {
 
     @Test
     public void testFindWithKeyIncludingDot() {
-        assertEquals("jujang", tree.findFirst(".entries[0].pe\\.sccu").toString());
+        assertEquals("selector", tree.findFirst(".entries[0].pe\\.sccu").toString());
     }
 
     @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
     public void testWhenNotFound() {
-        Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"jujang\" }, {\"name\":\"Bill\", \"age\":26}]}");
+        Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
         SimpleJsonTreeSelector aTree = new SimpleJsonTreeSelector(elem);
         assertNull(aTree.findFirst(".entry"));
         assertNull(aTree.findFirst(".entries[2]"));

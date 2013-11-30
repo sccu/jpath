@@ -1,4 +1,4 @@
-package pe.sccu.tree;
+package pe.sccu.selector;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -14,8 +14,8 @@ public class SimpleJsonTreeSelector extends AbstractTreeSelector<Object> {
     }
 
     @Override
-    protected Object getByName(Object element, String key) {
-        return ((JSONObject) element).get(key);
+    protected Object getByName(Object element, String name) {
+        return ((JSONObject) element).get(name);
     }
 
     @Override

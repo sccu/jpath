@@ -1,8 +1,6 @@
-package pe.sccu.tree;
+package pe.sccu.selector;
 
 import static org.junit.Assert.*;
-
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +17,7 @@ public class GsonTreeSelectorTest {
     public void before() {
         Gson gson = new GsonBuilder().create();
         JsonElement elem = gson.fromJson(
-                "{entries: [{ pe.sccu:\"jujang\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
+                "{entries: [{ pe.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
         selector = new GsonTreeSelector(elem, true);
     }
@@ -52,13 +50,13 @@ public class GsonTreeSelectorTest {
 
     @Test
     public void testFindWithKeyIncludingDot() {
-        assertEquals("jujang", selector.findFirst(".entries[0].pe\\.sccu").getAsString());
+        assertEquals("selector", selector.findFirst(".entries[0].pe\\.sccu").getAsString());
     }
 
     @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
     public void testWhenNotFound() {
         Gson gson = new GsonBuilder().create();
-        JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"jujang\" }, {name:\"Bill\", age:26}]}",
+        JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"selector\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
         GsonTreeSelector aSelector = new GsonTreeSelector(elem);
         assertNull(aSelector.findFirst(".entry"));
@@ -70,11 +68,10 @@ public class GsonTreeSelectorTest {
 
     @Test
     public void testFindAll() {
-        List<JsonElement> elems = selector.findAll(".entries[*].name");
-        assertEquals(2, elems.size());
-
-        elems = selector.findAll(".entries[*].age");
-        assertEquals(1, elems.size());
+        assertEquals(2, selector.findAll(".entries[*].name").size());
+        assertEquals(1, selector.findAll(".entries[*].age").size());
+        assertEquals(2, selector.findAll(".entries[1].*").size());
+        assertEquals(4, selector.findAll(".entries[*].*").size());
     }
 
 }
