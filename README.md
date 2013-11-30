@@ -57,8 +57,8 @@ AbstractTreeSelector<JsonElement> aSelector = new AbstractTreeSelector<JsonEleme
     }
 }
 
-assertEquals(2, selector.findAll(".entries[*].name").size());
-assertEquals(1, selector.findAll(".entries[*].age").size());
-assertEquals(2, selector.findAll(".entries[1].*").size());
-assertEquals(4, selector.findAll(".entries[*].*").size());
+assertEquals(2, aSelector.findAll(".entries[*].name").size());
+assertEquals(1, aSelector.findAll(".entries[*].age").size());
+assertEquals(2, aSelector.findAll(".entries[1].*").size());
+assertEquals(4, aSelector.findAll(".entries[*].*").size());
 ```
