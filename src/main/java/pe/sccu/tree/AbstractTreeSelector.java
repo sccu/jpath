@@ -1,9 +1,14 @@
 package pe.sccu.tree;
 
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 public abstract class AbstractTreeSelector<T> {
 
-    private final boolean throwExceptionWhenNotFound;
     protected final T element;
+    private final boolean throwExceptionWhenNotFound;
 
     protected AbstractTreeSelector(T element) {
         this(element, false);
@@ -59,6 +64,8 @@ public abstract class AbstractTreeSelector<T> {
                     state = 5;
                 } else if (Character.isDigit(lookahead)) {
                     state = 7;
+                } else if (lookahead == '*') {
+                    state = 8;
                 } else {
                     throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
@@ -85,6 +92,19 @@ public abstract class AbstractTreeSelector<T> {
                     throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
                 break;
+            case 8:
+                if (lookahead == ']') {
+                    state = 9;
+                } else {
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
+                }
+                break;
+            case 9:
+                if (lookahead == '[' || lookahead == '.') {
+                    return new Token(Token.Type.ARRAY_PATTERN, jpath.substring(start + 1, next - 1), next);
+                } else {
+                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
+                }
             }
 
             next++;
@@ -94,16 +114,40 @@ public abstract class AbstractTreeSelector<T> {
             return new Token(Token.Type.OBJECT, jpath.substring(start + 1, next).replace("\\", ""), next);
         } else if (state == 6) {
             return new Token(Token.Type.ARRAY, jpath.substring(start + 1, next - 1), next);
+        } else if (state == 9) {
+            return new Token(Token.Type.ARRAY_PATTERN, jpath.substring(start + 1, next - 1), next);
         } else {
             return new Token(Token.Type.EOP, jpath, 0);
         }
     }
 
-    public T find(String jpath) {
+    public T findFirst(String jpath) {
         try {
-            T result = find(element, jpath, 0);
+            List<T> result = findElements(ImmutableList.of(element), jpath, 0);
+            if (result == null || result.isEmpty()) {
+                throw new ElementNotFoundException(jpath);
+            }
+            return result.get(0);
+        } catch (IndexOutOfBoundsException e) {
+            if (throwExceptionWhenNotFound) {
+                throw new ElementNotFoundException(jpath, e);
+            } else {
+                return null;
+            }
+        } catch (NullPointerException e) {
+            if (throwExceptionWhenNotFound) {
+                throw new ElementNotFoundException(jpath);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public List<T> findAll(String jpath) {
+        try {
+            List<T> result = findElements(ImmutableList.of(element), jpath, 0);
             if (result == null) {
-                throw new NullPointerException();
+                throw new ElementNotFoundException(jpath);
             }
             return result;
         } catch (IndexOutOfBoundsException e) {
@@ -112,27 +156,59 @@ public abstract class AbstractTreeSelector<T> {
             } else {
                 return null;
             }
-        } catch (NullPointerException e) {
+        } catch (ElementNotFoundException e) {
             if (throwExceptionWhenNotFound) {
-                throw new IllegalArgumentException("Invalid path:" + jpath);
+                throw e;
             } else {
                 return null;
             }
         }
     }
 
-    private T find(T element, String jpath, int endIndex) {
+    private List<T> findElements(List<T> elements, String jpath, int endIndex) {
         Token t = getNextToken(jpath, endIndex);
         switch (t.getType()) {
-        case ARRAY:
-            return find(getByIndex(element, Integer.parseInt(t.getData())), jpath, t.getEndIndex());
-        case OBJECT:
-            return find(getByName(element, t.getData()), jpath, t.getEndIndex());
+        case ARRAY: {
+            List<T> candidates = Lists.newArrayList();
+            for (T element : elements) {
+                T child = getByIndex(element, Integer.parseInt(t.getData()));
+                if (child != null) {
+                    candidates.add(child);
+                }
+            }
+            return findElements(candidates, jpath, t.getEndIndex());
+        }
+        case ARRAY_PATTERN: {
+            List<T> candidates = Lists.newArrayList();
+            for (T element : elements) {
+                List<T> children = getByIndexPattern(element, t.getData());
+                for (T child : children) {
+                    if (child != null) {
+                        candidates.add(child);
+                    }
+                }
+            }
+            return findElements(candidates, jpath, t.getEndIndex());
+        }
+        case OBJECT: {
+            List<T> candidates = Lists.newArrayList();
+            for (T element : elements) {
+                T child = getByName(element, t.getData());
+                if (child != null) {
+                    candidates.add(child);
+                }
+            }
+            return findElements(candidates, jpath, t.getEndIndex());
+        }
         case EOP:
-            return element;
+            return elements;
         default:
             throw new IllegalArgumentException("jpath:" + jpath);
         }
+    }
+
+    protected List<T> getByIndexPattern(T element, String indexPattern) {
+        throw new UnsupportedOperationException();
     }
 
     protected abstract T getByName(T element, String key);
@@ -163,7 +239,24 @@ public abstract class AbstractTreeSelector<T> {
         }
 
         public enum Type {
-            OBJECT, EOP, ARRAY
+            ARRAY,
+            ARRAY_PATTERN,
+            OBJECT,
+            OBJECT_PATTERN,
+            EOP,
+        }
+    }
+
+    public static class ElementNotFoundException extends RuntimeException {
+        private final String path;
+
+        public ElementNotFoundException(String jpath) {
+            this(jpath, null);
+        }
+
+        public ElementNotFoundException(String jpath, Throwable e) {
+            super(e);
+            this.path = jpath;
         }
     }
 }
