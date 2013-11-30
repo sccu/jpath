@@ -33,14 +33,14 @@ public class GsonTreeSelectorTest {
         assertEquals(26, selector.findFirst(".entries[1].age").getAsInt());
     }
 
-    @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
+    @Test(expected = ElementsNotFoundException.class)
     public void testIOBException() {
         selector.findFirst(".entries[2]");
     }
 
-    @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
+    @Test(expected = ElementsNotFoundException.class)
     public void testInvalidPath() {
-        assertNull(selector.findFirst(".entries[1].gender"));
+        selector.findFirst(".entries[1].gender");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -53,7 +53,7 @@ public class GsonTreeSelectorTest {
         assertEquals("selector", selector.findFirst(".entries[0].pe\\.sccu").getAsString());
     }
 
-    @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
         Gson gson = new GsonBuilder().create();
         JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"selector\" }, {name:\"Bill\", age:26}]}",
@@ -64,6 +64,7 @@ public class GsonTreeSelectorTest {
         assertNull(aSelector.findFirst(".entries[1].gender"));
 
         aSelector.findFirst(".entries[a].gender");
+        aSelector.findFirst(".entries[*].gender");
     }
 
     @Test

@@ -30,14 +30,10 @@ public class SimpleJsonTreeSelectorTest {
         assertEquals("26", tree.findFirst(".entries[1].age").toString());
     }
 
-    @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
-    public void testIOBException() {
-        tree.findFirst(".entries[2]");
-    }
-
-    @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
-    public void testWrongKey() {
+    @Test(expected = ElementsNotFoundException.class)
+    public void testNotFound() {
         tree.findFirst(".entries[1].gender");
+        tree.findFirst(".entries[2]");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -50,7 +46,7 @@ public class SimpleJsonTreeSelectorTest {
         assertEquals("selector", tree.findFirst(".entries[0].pe\\.sccu").toString());
     }
 
-    @Test(expected = AbstractTreeSelector.ElementNotFoundException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
         Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
         SimpleJsonTreeSelector aTree = new SimpleJsonTreeSelector(elem);

@@ -23,18 +23,19 @@ public abstract class AbstractTreeSelector<T> {
         try {
             List<T> result = findElements(ImmutableList.of(element), jpath, 0);
             if (result == null || result.isEmpty()) {
-                throw new ElementNotFoundException(jpath);
+                throw new ElementsNotFoundException(jpath);
             }
             return result.get(0);
         } catch (IndexOutOfBoundsException e) {
             if (throwExceptionWhenNotFound) {
-                throw new ElementNotFoundException(jpath, e);
+                throw new ElementsNotFoundException(jpath, e);
             } else {
                 return null;
             }
-        } catch (NullPointerException e) {
+            // } catch (NullPointerException e) {
+        } catch (ElementsNotFoundException e) {
             if (throwExceptionWhenNotFound) {
-                throw new ElementNotFoundException(jpath);
+                throw new ElementsNotFoundException(jpath);
             } else {
                 return null;
             }
@@ -44,8 +45,8 @@ public abstract class AbstractTreeSelector<T> {
     public List<T> findAll(String jpath) {
         try {
             List<T> result = findElements(ImmutableList.of(element), jpath, 0);
-            if (result == null) {
-                throw new ElementNotFoundException(jpath);
+            if (result == null || result.isEmpty()) {
+                throw new ElementsNotFoundException(jpath);
             }
             return result;
         } catch (IndexOutOfBoundsException e) {
@@ -54,7 +55,7 @@ public abstract class AbstractTreeSelector<T> {
             } else {
                 return null;
             }
-        } catch (ElementNotFoundException e) {
+        } catch (ElementsNotFoundException e) {
             if (throwExceptionWhenNotFound) {
                 throw e;
             } else {
@@ -133,16 +134,4 @@ public abstract class AbstractTreeSelector<T> {
         throw new UnsupportedOperationException();
     }
 
-    public static class ElementNotFoundException extends RuntimeException {
-        private final String path;
-
-        public ElementNotFoundException(String jpath) {
-            this(jpath, null);
-        }
-
-        public ElementNotFoundException(String jpath, Throwable e) {
-            super(e);
-            this.path = jpath;
-        }
-    }
 }
