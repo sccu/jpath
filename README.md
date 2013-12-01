@@ -1,6 +1,8 @@
 AbstractTreeSelector
 =====
 
+Jpath is a node selector in tree-like structure like jQuery.
+
 * Finding elements with a path string.
 * You can use it with JSON, XML, YAML or built-in Map and List classes.
 * Simply overriding two methods - getByName() and getByIndex().
