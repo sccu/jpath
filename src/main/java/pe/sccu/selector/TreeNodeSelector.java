@@ -5,23 +5,33 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-public abstract class AbstractTreeSelector<T> {
+public class TreeNodeSelector<E> {
 
-    protected final T element;
+    protected final E element;
     private final boolean throwExceptionWhenNotFound;
+    private final NodeGetter<E> nodeGetter;
 
-    protected AbstractTreeSelector(T element) {
+    public TreeNodeSelector(E element) {
         this(element, false);
     }
 
-    protected AbstractTreeSelector(T element, boolean throwExceptionWhenNotFound) {
+    public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound) {
+        this(element, throwExceptionWhenNotFound, new DefaultNodeGetter<E>());
+    }
+
+    public TreeNodeSelector(E element, NodeGetter<E> nodeGetter) {
+        this(element, false, nodeGetter);
+    }
+
+    public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound, NodeGetter<E> nodeGetter) {
         this.element = element;
+        this.nodeGetter = nodeGetter;
         this.throwExceptionWhenNotFound = throwExceptionWhenNotFound;
     }
 
-    public T findFirst(String jpath) {
+    public E findFirst(String jpath) {
         try {
-            List<T> result = findElements(ImmutableList.of(element), jpath, 0);
+            List<E> result = findElements(ImmutableList.of(element), jpath, 0);
             if (result == null || result.isEmpty()) {
                 throw new ElementsNotFoundException(jpath);
             }
@@ -42,9 +52,9 @@ public abstract class AbstractTreeSelector<T> {
         }
     }
 
-    public List<T> findAll(String jpath) {
+    public List<E> findAll(String jpath) {
         try {
-            List<T> result = findElements(ImmutableList.of(element), jpath, 0);
+            List<E> result = findElements(ImmutableList.of(element), jpath, 0);
             if (result == null || result.isEmpty()) {
                 throw new ElementsNotFoundException(jpath);
             }
@@ -64,13 +74,13 @@ public abstract class AbstractTreeSelector<T> {
         }
     }
 
-    private List<T> findElements(List<T> elements, String jpath, int endIndex) {
+    private List<E> findElements(List<E> elements, String jpath, int endIndex) {
         SelectorToken t = SelectorToken.getNextToken(jpath, endIndex);
         switch (t.getType()) {
         case ARRAY: {
-            List<T> candidates = Lists.newArrayList();
-            for (T element : elements) {
-                T child = getByIndex(element, Integer.parseInt(t.getData()));
+            List<E> candidates = Lists.newArrayList();
+            for (E element : elements) {
+                E child = nodeGetter.getByIndex(element, Integer.parseInt(t.getData()));
                 if (child != null) {
                     candidates.add(child);
                 }
@@ -78,10 +88,10 @@ public abstract class AbstractTreeSelector<T> {
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case ARRAY_PATTERN: {
-            List<T> candidates = Lists.newArrayList();
-            for (T element : elements) {
-                List<T> children = getAllByIndexPattern(element, t.getData());
-                for (T child : children) {
+            List<E> candidates = Lists.newArrayList();
+            for (E element : elements) {
+                List<E> children = nodeGetter.getAllByIndexPattern(element, t.getData());
+                for (E child : children) {
                     if (child != null) {
                         candidates.add(child);
                     }
@@ -90,9 +100,9 @@ public abstract class AbstractTreeSelector<T> {
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case OBJECT: {
-            List<T> candidates = Lists.newArrayList();
-            for (T element : elements) {
-                T child = getByName(element, t.getData());
+            List<E> candidates = Lists.newArrayList();
+            for (E element : elements) {
+                E child = nodeGetter.getByName(element, t.getData());
                 if (child != null) {
                     candidates.add(child);
                 }
@@ -100,10 +110,10 @@ public abstract class AbstractTreeSelector<T> {
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case OBJECT_PATTERN: {
-            List<T> candidates = Lists.newArrayList();
-            for (T element : elements) {
-                List<T> children = getAllByNamePattern(element, t.getData());
-                for (T child : children) {
+            List<E> candidates = Lists.newArrayList();
+            for (E element : elements) {
+                List<E> children = nodeGetter.getAllByNamePattern(element, t.getData());
+                for (E child : children) {
                     if (child != null) {
                         candidates.add(child);
                     }
@@ -116,22 +126,6 @@ public abstract class AbstractTreeSelector<T> {
         default:
             throw new IllegalArgumentException("jpath:" + jpath);
         }
-    }
-
-    protected T getByName(T element, String name) {
-        throw new UnsupportedOperationException();
-    }
-
-    protected T getByIndex(T element, int index) {
-        throw new UnsupportedOperationException();
-    }
-
-    protected List<T> getAllByIndexPattern(T element, String indexPattern) {
-        throw new UnsupportedOperationException();
-    }
-
-    protected List<T> getAllByNamePattern(T element, String namePattern) {
-        throw new UnsupportedOperationException();
     }
 
 }
