@@ -1,66 +1,50 @@
 AbstractTreeSelector
 =====
 
-Jpath is a node selector in tree-like structure like jQuery.
+Jpath is - like jQuery - a node selector in tree-like structure.
 
 * Finding elements with a path string.
 * You can use it with JSON, XML, YAML or built-in Map and List classes.
-* Simply overriding two methods - getByName() and getByIndex().
-* To get all matched elements, override two more methods - getAllByNamePattern() and getAllByIndexPattern().
+* Simply overriding two methods - getByName() and getByIndex(), you can use it with any tree-like data object.
+* To get all matched elements, override two more methods - getAllMembers() and getAllArrayElements().
+* Including test cases for org.json.simple, gson, snake YAML.
 
-Usage:
+
+Using with org.json.simple:
 ```java
-Gson gson = new GsonBuilder().create();
-JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"package\" }, {name:\"Bill\", age:26}]}",
-        JsonElement.class);
-AbstractTreeSelector<JsonElement> aSelector = new AbstractTreeSelector<JsonElement>() {
-    @Override
-    protected JsonElement getByName(JsonElement element, String key) {
-        return element.getAsJsonObject().get(key);
-    }
+Object elem = JSONValue
+        .parse("{\"entries\": [{ \"pe.sccu\":\"selector\", \"name\":\"Steve\" }, {\"name\":\"Bill\", \"age\":26}]}");
+selector = TreeNodeSelector.create(elem, true);
 
-    @Override
-    protected JsonElement getByIndex(JsonElement element, int index) {
-        return element.getAsJsonArray().get(index);
-    }
-}
 assertEquals("Bill", selector.find(".entries[1].name").getAsString());
 assertEquals(26, selector.find(".entries[1].age").getAsInt());
 
-assertNull(aSelector.find(".entry"));
-assertNull(aSelector.find(".entries[2]"));
-assertNull(aSelector.find(".entries[1].gender"));
+assertEquals(1, selector.findAll(".entries[*].age").size());
+assertEquals(2, selector.findAll(".entries[1].*").size());
+assertEquals(4, selector.findAll(".entries[*].*").size());
 ```
 
+Using with Gson:
 ```java
-...
-AbstractTreeSelector<JsonElement> aSelector = new AbstractTreeSelector<JsonElement>() {
-    ...
+Gson gson = new GsonBuilder().create();
+JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
+        JsonElement.class);
+selector = TreeNodeSelector.create(elem, true, new DefaultNodeAccessor<JsonElement>() {
     @Override
-    protected List<JsonElement> getAllByIndexPattern(JsonElement element, String indexPattern) {
-        if (indexPattern.equals("*")) {
-            return ImmutableList.copyOf(element.getAsJsonArray());
-        } else {
-            return ImmutableList.of();
-        }
+    public JsonElement getByName(JsonElement element, String name) {
+        return element.getAsJsonObject().get(name);
     }
 
     @Override
-    protected List<JsonElement> getAllByNamePattern(JsonElement element, String namePattern) {
-        if (namePattern.equals("*")) {
-            List<JsonElement> elements = Lists.newArrayList();
-            for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
-                elements.add(entry.getValue());
-            }
-            return elements;
-        } else {
-            return ImmutableList.of();
-        }
+    public Collection<Map.Entry<String, JsonElement>> getAllMembers(JsonElement element) {
+        return element.getAsJsonObject().entrySet();
     }
-}
+});
 
-assertEquals(2, aSelector.findAll(".entries[*].name").size());
-assertEquals(1, aSelector.findAll(".entries[*].age").size());
-assertEquals(2, aSelector.findAll(".entries[1].*").size());
-assertEquals(4, aSelector.findAll(".entries[*].*").size());
+assertEquals("Bill", selector.find(".entries[1].name").getAsString());
+assertEquals(26, selector.find(".entries[1].age").getAsInt());
+
+assertEquals(1, selector.findAll(".entries[*].age").size());
+assertEquals(2, selector.findAll(".entries[1].*").size());
+assertEquals(4, selector.findAll(".entries[*].*").size());
 ```

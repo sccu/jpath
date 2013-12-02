@@ -7,7 +7,7 @@ import org.json.simple.JSONValue;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimpleJsonTreeSelectorTest {
+public class SimpleJsonSelectorTest {
 
     private TreeNodeSelector selector;
 
