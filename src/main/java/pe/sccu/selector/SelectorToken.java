@@ -5,17 +5,17 @@ class SelectorToken {
     private final String data;
     private final int endIndex;
 
-    public SelectorToken(Type type, String data, int endIndex) {
+    private SelectorToken(Type type, String data, int endIndex) {
         this.type = type;
         this.data = data;
         this.endIndex = endIndex;
     }
 
-    static SelectorToken getNextToken(String jpath, int start) {
+    static SelectorToken getNextToken(String path, int start) {
         int next = start;
         State state = State.S0;
-        while (next < jpath.length()) {
-            char lookahead = jpath.charAt(next);
+        while (next < path.length()) {
+            char lookahead = path.charAt(next);
             switch (state) {
             case S0:
                 if (lookahead == '.') {
@@ -43,7 +43,7 @@ class SelectorToken {
                 } else if (lookahead == '\\') {
                     state = State.S3;
                 } else if (lookahead == '.' || lookahead == '[') {
-                    return new SelectorToken(Type.OBJECT, jpath.substring(start + 1, next).replace("\\", ""), next);
+                    return new SelectorToken(Type.OBJECT, path.substring(start + 1, next).replace("\\", ""), next);
                 } else {
                     throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
@@ -75,7 +75,7 @@ class SelectorToken {
                 break;
             case S6:
                 if (lookahead == '[' || lookahead == '.') {
-                    return new SelectorToken(Type.ARRAY, jpath.substring(start + 1, next - 1), next);
+                    return new SelectorToken(Type.ARRAY, path.substring(start + 1, next - 1), next);
                 } else {
                     throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
@@ -97,13 +97,13 @@ class SelectorToken {
                 break;
             case S9:
                 if (lookahead == '[' || lookahead == '.') {
-                    return new SelectorToken(Type.ARRAY_PATTERN, jpath.substring(start + 1, next - 1), next);
+                    return new SelectorToken(Type.ARRAY_PATTERN, path.substring(start + 1, next - 1), next);
                 } else {
                     throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
             case S10:
                 if (lookahead == '[' || lookahead == '.') {
-                    return new SelectorToken(Type.OBJECT_PATTERN, jpath.substring(start + 1, next), next);
+                    return new SelectorToken(Type.OBJECT_PATTERN, path.substring(start + 1, next), next);
                 } else {
                     throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
                 }
@@ -113,15 +113,15 @@ class SelectorToken {
         }
 
         if (state == State.S2) {
-            return new SelectorToken(Type.OBJECT, jpath.substring(start + 1, next).replace("\\", ""), next);
+            return new SelectorToken(Type.OBJECT, path.substring(start + 1, next).replace("\\", ""), next);
         } else if (state == State.S6) {
-            return new SelectorToken(Type.ARRAY, jpath.substring(start + 1, next - 1), next);
+            return new SelectorToken(Type.ARRAY, path.substring(start + 1, next - 1), next);
         } else if (state == State.S9) {
-            return new SelectorToken(Type.ARRAY_PATTERN, jpath.substring(start + 1, next - 1), next);
+            return new SelectorToken(Type.ARRAY_PATTERN, path.substring(start + 1, next - 1), next);
         } else if (state == State.S10) {
-            return new SelectorToken(Type.OBJECT_PATTERN, jpath.substring(start + 1, next), next);
+            return new SelectorToken(Type.OBJECT_PATTERN, path.substring(start + 1, next), next);
         } else {
-            return new SelectorToken(Type.EOP, jpath, 0);
+            return new SelectorToken(Type.EOP, path, 0);
         }
     }
 

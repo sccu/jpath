@@ -1,6 +1,5 @@
 package pe.sccu.selector;
 
-import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -20,18 +19,12 @@ public class SimpleJsonTreeSelectorTest {
     }
 
     @Test
-    public void testNotNull() {
-        assertNotNull(selector.element);
-    }
-
-    @Test
     public void testFind() {
-        assertNotNull(selector.element);
         assertEquals("Bill", selector.findFirst(".entries[1].name").toString());
         assertEquals("26", selector.findFirst(".entries[1].age").toString());
     }
 
-    @Test(expected = ElementsNotFoundException.class)
+    @Test(expected = NodesNotFoundException.class)
     public void testNotFound() {
         selector.findFirst(".entries[1].gender");
         selector.findFirst(".entries[2]");

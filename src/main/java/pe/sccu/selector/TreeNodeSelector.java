@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 
 public class TreeNodeSelector<E> {
 
-    protected final E element;
+    private final E element;
     private final boolean throwExceptionWhenNotFound;
     private final NodeAccessor<E> nodeAccessor;
 
@@ -35,33 +35,33 @@ public class TreeNodeSelector<E> {
         return new TreeNodeSelector<E>(element, throwExceptionWhenNotFound, nodeAccessor);
     }
 
-    public E findFirst(String jpath) {
+    public E findFirst(String path) {
         try {
-            List<E> result = findElements(Lists.newArrayList(element), jpath, 0);
+            List<E> result = findElements(Lists.newArrayList(element), path, 0);
             if (result == null || result.isEmpty()) {
-                throw new ElementsNotFoundException(jpath);
+                throw new NodesNotFoundException(path);
             }
             return result.get(0);
         } catch (IndexOutOfBoundsException e) {
             if (throwExceptionWhenNotFound) {
-                throw new ElementsNotFoundException(jpath, e);
+                throw new NodesNotFoundException(path, e);
             } else {
                 return null;
             }
-        } catch (ElementsNotFoundException e) {
+        } catch (NodesNotFoundException e) {
             if (throwExceptionWhenNotFound) {
-                throw new ElementsNotFoundException(jpath);
+                throw new NodesNotFoundException(path);
             } else {
                 return null;
             }
         }
     }
 
-    public List<E> findAll(String jpath) {
+    public List<E> findAll(String path) {
         try {
-            List<E> result = findElements(Lists.newArrayList(element), jpath, 0);
+            List<E> result = findElements(Lists.newArrayList(element), path, 0);
             if (result == null || result.isEmpty()) {
-                throw new ElementsNotFoundException(jpath);
+                throw new NodesNotFoundException(path);
             }
             return result;
         } catch (IndexOutOfBoundsException e) {
@@ -70,7 +70,7 @@ public class TreeNodeSelector<E> {
             } else {
                 return null;
             }
-        } catch (ElementsNotFoundException e) {
+        } catch (NodesNotFoundException e) {
             if (throwExceptionWhenNotFound) {
                 throw e;
             } else {
@@ -79,8 +79,8 @@ public class TreeNodeSelector<E> {
         }
     }
 
-    private List<E> findElements(List<E> elements, String jpath, int endIndex) {
-        SelectorToken t = SelectorToken.getNextToken(jpath, endIndex);
+    private List<E> findElements(List<E> elements, String path, int endIndex) {
+        SelectorToken t = SelectorToken.getNextToken(path, endIndex);
         switch (t.getType()) {
         case ARRAY: {
             List<E> candidates = Lists.newArrayList();
@@ -90,11 +90,11 @@ public class TreeNodeSelector<E> {
                     candidates.add(child);
                 }
             }
-            return findElements(candidates, jpath, t.getEndIndex());
+            return findElements(candidates, path, t.getEndIndex());
         }
         case ARRAY_PATTERN: {
             List<E> candidates = getMatchedArrayElements(elements, t.getData());
-            return findElements(candidates, jpath, t.getEndIndex());
+            return findElements(candidates, path, t.getEndIndex());
         }
         case OBJECT: {
             List<E> candidates = Lists.newArrayList();
@@ -104,16 +104,16 @@ public class TreeNodeSelector<E> {
                     candidates.add(child);
                 }
             }
-            return findElements(candidates, jpath, t.getEndIndex());
+            return findElements(candidates, path, t.getEndIndex());
         }
         case OBJECT_PATTERN: {
             List<E> candidates = getMatchedMembers(elements, t.getData());
-            return findElements(candidates, jpath, t.getEndIndex());
+            return findElements(candidates, path, t.getEndIndex());
         }
         case EOP:
             return elements;
         default:
-            throw new IllegalArgumentException("jpath:" + jpath);
+            throw new IllegalArgumentException("path:" + path);
         }
     }
 

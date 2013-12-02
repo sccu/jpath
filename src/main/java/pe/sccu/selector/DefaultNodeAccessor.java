@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class DefaultNodeAccessor<E> implements NodeAccessor<E> {
     @Override
     public E getByName(E element, String name) {
         if (element instanceof Map) {
-            return ((Map<String, E>) element).get(name);
+            return ((Map<?, E>) element).get(name);
         }
 
         throw new IllegalArgumentException("Unsupported type:" + element.getClass().getCanonicalName());
@@ -38,7 +38,7 @@ public class DefaultNodeAccessor<E> implements NodeAccessor<E> {
     @Override
     public List<E> getAllArrayElements(E element) {
         if (element instanceof Iterable) {
-            return ImmutableList.copyOf(((Iterable) element).iterator());
+            return Lists.newArrayList(((Iterable) element).iterator());
         }
 
         throw new IllegalArgumentException("Unsupported type:" + element.getClass().getCanonicalName());

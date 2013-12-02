@@ -23,22 +23,17 @@ public class GsonTreeSelectorTest {
     }
 
     @Test
-    public void testNotNull() {
-        assertNotNull(selector.element);
-    }
-
-    @Test
     public void testFind() {
         assertEquals("Bill", selector.findFirst(".entries[1].name").getAsString());
         assertEquals(26, selector.findFirst(".entries[1].age").getAsInt());
     }
 
-    @Test(expected = ElementsNotFoundException.class)
+    @Test(expected = NodesNotFoundException.class)
     public void testIOBException() {
         selector.findFirst(".entries[2]");
     }
 
-    @Test(expected = ElementsNotFoundException.class)
+    @Test(expected = NodesNotFoundException.class)
     public void testInvalidPath() {
         selector.findFirst(".entries[1].gender");
     }
@@ -73,6 +68,18 @@ public class GsonTreeSelectorTest {
         assertEquals(1, selector.findAll(".entries[*].age").size());
         assertEquals(2, selector.findAll(".entries[1].*").size());
         assertEquals(4, selector.findAll(".entries[*].*").size());
+    }
+
+    @Test
+    public void testNodesNotFoundException() {
+        String eMessage = null;
+        try {
+            selector.findFirst(".entries[1].gender");
+        } catch (NodesNotFoundException e) {
+            eMessage = e.getMessage();
+        }
+
+        assertNotNull(eMessage);
     }
 
 }

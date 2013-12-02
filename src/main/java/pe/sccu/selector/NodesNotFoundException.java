@@ -1,13 +1,13 @@
 package pe.sccu.selector;
 
-public class ElementsNotFoundException extends RuntimeException {
+public class NodesNotFoundException extends RuntimeException {
     private final String path;
 
-    public ElementsNotFoundException(String jpath) {
+    public NodesNotFoundException(String jpath) {
         this(jpath, null);
     }
 
-    public ElementsNotFoundException(String jpath, Throwable e) {
+    public NodesNotFoundException(String jpath, Throwable e) {
         super(e);
         this.path = jpath;
     }
