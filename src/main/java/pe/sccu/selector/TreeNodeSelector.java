@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 public class TreeNodeSelector<E> {
@@ -38,7 +37,7 @@ public class TreeNodeSelector<E> {
 
     public E findFirst(String jpath) {
         try {
-            List<E> result = findElements(ImmutableList.of(element), jpath, 0);
+            List<E> result = findElements(Lists.newArrayList(element), jpath, 0);
             if (result == null || result.isEmpty()) {
                 throw new ElementsNotFoundException(jpath);
             }
@@ -49,7 +48,6 @@ public class TreeNodeSelector<E> {
             } else {
                 return null;
             }
-            // } catch (NullPointerException e) {
         } catch (ElementsNotFoundException e) {
             if (throwExceptionWhenNotFound) {
                 throw new ElementsNotFoundException(jpath);
@@ -61,7 +59,7 @@ public class TreeNodeSelector<E> {
 
     public List<E> findAll(String jpath) {
         try {
-            List<E> result = findElements(ImmutableList.of(element), jpath, 0);
+            List<E> result = findElements(Lists.newArrayList(element), jpath, 0);
             if (result == null || result.isEmpty()) {
                 throw new ElementsNotFoundException(jpath);
             }
