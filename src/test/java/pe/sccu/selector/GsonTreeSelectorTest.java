@@ -19,7 +19,7 @@ public class GsonTreeSelectorTest {
         JsonElement elem = gson.fromJson(
                 "{entries: [{ pe.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
-        selector = new TreeNodeSelector(elem, true, new GsonNodeGetter());
+        selector = new TreeNodeSelector(elem, true, new GsonNodeAccessor());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class GsonTreeSelectorTest {
         Gson gson = new GsonBuilder().create();
         JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"selector\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
-        TreeNodeSelector<JsonElement> aSelector = new TreeNodeSelector(elem, new GsonNodeGetter());
+        TreeNodeSelector<JsonElement> aSelector = new TreeNodeSelector(elem, new GsonNodeAccessor());
         assertNull(aSelector.findFirst(".entry"));
         assertNull(aSelector.findFirst(".entries[2]"));
         assertNull(aSelector.findFirst(".entries[1].gender"));

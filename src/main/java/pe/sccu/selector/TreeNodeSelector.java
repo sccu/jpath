@@ -1,6 +1,8 @@
 package pe.sccu.selector;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -9,23 +11,23 @@ public class TreeNodeSelector<E> {
 
     protected final E element;
     private final boolean throwExceptionWhenNotFound;
-    private final NodeGetter<E> nodeGetter;
+    private final NodeAccessor<E> nodeAccessor;
 
     public TreeNodeSelector(E element) {
         this(element, false);
     }
 
     public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound) {
-        this(element, throwExceptionWhenNotFound, new DefaultNodeGetter<E>());
+        this(element, throwExceptionWhenNotFound, new DefaultNodeAccessor<E>());
     }
 
-    public TreeNodeSelector(E element, NodeGetter<E> nodeGetter) {
-        this(element, false, nodeGetter);
+    public TreeNodeSelector(E element, NodeAccessor<E> nodeAccessor) {
+        this(element, false, nodeAccessor);
     }
 
-    public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound, NodeGetter<E> nodeGetter) {
+    public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound, NodeAccessor<E> nodeAccessor) {
         this.element = element;
-        this.nodeGetter = nodeGetter;
+        this.nodeAccessor = nodeAccessor;
         this.throwExceptionWhenNotFound = throwExceptionWhenNotFound;
     }
 
@@ -80,7 +82,7 @@ public class TreeNodeSelector<E> {
         case ARRAY: {
             List<E> candidates = Lists.newArrayList();
             for (E element : elements) {
-                E child = nodeGetter.getByIndex(element, Integer.parseInt(t.getData()));
+                E child = nodeAccessor.getByIndex(element, Integer.parseInt(t.getData()));
                 if (child != null) {
                     candidates.add(child);
                 }
@@ -88,21 +90,13 @@ public class TreeNodeSelector<E> {
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case ARRAY_PATTERN: {
-            List<E> candidates = Lists.newArrayList();
-            for (E element : elements) {
-                List<E> children = nodeGetter.getAllByIndexPattern(element, t.getData());
-                for (E child : children) {
-                    if (child != null) {
-                        candidates.add(child);
-                    }
-                }
-            }
+            List<E> candidates = getMatchedArrayElements(elements, t.getData());
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case OBJECT: {
             List<E> candidates = Lists.newArrayList();
             for (E element : elements) {
-                E child = nodeGetter.getByName(element, t.getData());
+                E child = nodeAccessor.getByName(element, t.getData());
                 if (child != null) {
                     candidates.add(child);
                 }
@@ -110,15 +104,7 @@ public class TreeNodeSelector<E> {
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case OBJECT_PATTERN: {
-            List<E> candidates = Lists.newArrayList();
-            for (E element : elements) {
-                List<E> children = nodeGetter.getAllByNamePattern(element, t.getData());
-                for (E child : children) {
-                    if (child != null) {
-                        candidates.add(child);
-                    }
-                }
-            }
+            List<E> candidates = getMatchedMembers(elements, t.getData());
             return findElements(candidates, jpath, t.getEndIndex());
         }
         case EOP:
@@ -126,6 +112,36 @@ public class TreeNodeSelector<E> {
         default:
             throw new IllegalArgumentException("jpath:" + jpath);
         }
+    }
+
+    private List<E> getMatchedArrayElements(List<E> elements, String indexPattern) {
+        List<E> candidates = Lists.newArrayList();
+        for (E element : elements) {
+            List<E> children = nodeAccessor.getAllArrayElements(element);
+            for (E child : children) {
+                if (child != null) {
+                    if ("*".equals(indexPattern)) {
+                        candidates.add(child);
+                    }
+                }
+            }
+        }
+        return candidates;
+    }
+
+    private List<E> getMatchedMembers(List<E> elements, String data) {
+        List<E> candidates = Lists.newArrayList();
+        for (E element : elements) {
+            Collection<Map.Entry<String, E>> members = nodeAccessor.getAllMembers(element);
+            for (Map.Entry<String, E> member : members) {
+                if (member.getValue() != null) {
+                    if ("*".equals(data)) {
+                        candidates.add(member.getValue());
+                    }
+                }
+            }
+        }
+        return candidates;
     }
 
 }

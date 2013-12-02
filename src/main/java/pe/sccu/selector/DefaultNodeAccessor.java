@@ -1,11 +1,12 @@
 package pe.sccu.selector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
-public class DefaultNodeGetter<E> implements NodeGetter<E> {
+public class DefaultNodeAccessor<E> implements NodeAccessor<E> {
     @Override
     public E getByName(E element, String name) {
         if (element instanceof Map) {
@@ -35,26 +36,18 @@ public class DefaultNodeGetter<E> implements NodeGetter<E> {
     }
 
     @Override
-    public List<E> getAllByIndexPattern(E element, String indexPattern) {
-        if (indexPattern.equals("*")) {
-            if (element instanceof Iterable) {
-                return ImmutableList.copyOf(((Iterable) element).iterator());
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported index pattern:" + indexPattern);
+    public List<E> getAllArrayElements(E element) {
+        if (element instanceof Iterable) {
+            return ImmutableList.copyOf(((Iterable) element).iterator());
         }
 
         throw new IllegalArgumentException("Unsupported type:" + element.getClass().getCanonicalName());
     }
 
     @Override
-    public List<E> getAllByNamePattern(E element, String namePattern) {
-        if (namePattern.equals("*")) {
-            if (element instanceof Map) {
-                return ImmutableList.copyOf(((Map<Object, E>) element).values());
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported name pattern:" + namePattern);
+    public Collection<Map.Entry<String, E>> getAllMembers(E element) {
+        if (element instanceof Map) {
+            return ((Map<String, E>) element).entrySet();
         }
 
         throw new IllegalArgumentException("Unsupported type:" + element.getClass().getCanonicalName());
