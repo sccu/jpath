@@ -16,7 +16,7 @@ public class SimpleJsonTreeSelectorTest {
     public void before() {
         Object elem = JSONValue
                 .parse("{\"entries\": [{ \"pe.sccu\":\"selector\", \"name\":\"Steve\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        selector = new TreeNodeSelector(elem, true);
+        selector = TreeNodeSelector.create(elem, true);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class SimpleJsonTreeSelectorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
         Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        TreeNodeSelector aTree = new TreeNodeSelector(elem);
+        TreeNodeSelector aTree = TreeNodeSelector.create(elem);
         assertNull(aTree.findFirst(".entry"));
         assertNull(aTree.findFirst(".entries[2]"));
         assertNull(aTree.findFirst(".entries[1].gender"));

@@ -13,22 +13,27 @@ public class TreeNodeSelector<E> {
     private final boolean throwExceptionWhenNotFound;
     private final NodeAccessor<E> nodeAccessor;
 
-    public TreeNodeSelector(E element) {
-        this(element, false);
-    }
-
-    public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound) {
-        this(element, throwExceptionWhenNotFound, new DefaultNodeAccessor<E>());
-    }
-
-    public TreeNodeSelector(E element, NodeAccessor<E> nodeAccessor) {
-        this(element, false, nodeAccessor);
-    }
-
-    public TreeNodeSelector(E element, boolean throwExceptionWhenNotFound, NodeAccessor<E> nodeAccessor) {
+    private TreeNodeSelector(E element, boolean throwExceptionWhenNotFound, NodeAccessor<E> nodeAccessor) {
         this.element = element;
         this.nodeAccessor = nodeAccessor;
         this.throwExceptionWhenNotFound = throwExceptionWhenNotFound;
+    }
+
+    public static <E> TreeNodeSelector<E> create(E element) {
+        return create(element, false);
+    }
+
+    public static <E> TreeNodeSelector<E> create(E element, boolean throwExceptionWhenNotFound) {
+        return create(element, throwExceptionWhenNotFound, new DefaultNodeAccessor<E>());
+    }
+
+    public static <E> TreeNodeSelector<E> create(E element, NodeAccessor<E> nodeAccessor) {
+        return create(element, false, nodeAccessor);
+    }
+
+    public static <E> TreeNodeSelector<E> create(E element, boolean throwExceptionWhenNotFound,
+            NodeAccessor<E> nodeAccessor) {
+        return new TreeNodeSelector<E>(element, throwExceptionWhenNotFound, nodeAccessor);
     }
 
     public E findFirst(String jpath) {
