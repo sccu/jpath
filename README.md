@@ -3,12 +3,8 @@ AbstractTreeSelector
 
 Jpath is - like jQuery - a node selector in tree-like structure.
 
-* Finding elements with a path string.
 * You can use it with JSON, XML, YAML or built-in Map and List classes.
-* Simply overriding two methods - getByName() and getByIndex(), you can use it with any tree-like data object.
-* To get all matched elements, override two more methods - getAllMembers() and getAllArrayElements().
-* Including test cases for org.json.simple, gson, snake YAML.
-
+* Do not parse json again. It works with already made tree-like objects.
 
 Using with org.json.simple:
 ```java
