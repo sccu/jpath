@@ -3,6 +3,8 @@ package pe.sccu.selector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,16 +12,18 @@ import org.junit.Test;
 public class SimpleJsonSelectorTest {
 
     private TreeNodeSelector selector;
+    Object elem;
 
     @Before
     public void before() {
-        Object elem = JSONValue
+        elem = JSONValue
                 .parse("{\"entries\": [{ \"pe.sccu\":\"selector\", \"name\":\"Steve\" }, {\"name\":\"Bill\", \"age\":26}]}");
         selector = TreeNodeSelector.create(elem, true);
     }
 
     @Test
     public void testFind() {
+        ((JSONObject) ((JSONArray) ((JSONObject) elem).get("entries")).get(1)).get("name");
         assertEquals("Bill", selector.findFirst(".entries[1].name").toString());
         assertEquals("26", selector.findFirst(".entries[1].age").toString());
     }

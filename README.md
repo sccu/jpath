@@ -3,8 +3,16 @@ jPath
 
 jPath is a node selector in json object.
 
-* You can use it with JSON, YAML or built-in Map and List classes. You can use it with XML, but don't need to.
+* You can use it on JSON, YAML or built-in Map and List classes. (With XML, it works but not much useful.)
 * Do not parse data again. It works with parsed tree objects.
+
+```java
+// BEFORE
+((JSONObject)((JSONArray)((JSONObject) elem).get("entries")).get(1)).get("name");
+
+// AFTER
+selector.findFirst(".entries[1].name");
+```
 
 Using with org.json.simple:
 ```java
