@@ -8,7 +8,8 @@ jPath is a node selector in json object.
 
 ```java
 // BEFORE
-((JSONObject)((JSONArray)((JSONObject) elem).get("entries")).get(1)).get("name");
+((JSONObject)((JSONArray)((JSONObject) elem).get("entries")).get(1)).get("name");   // for org.json.simple
+elem.getAsJsonObject().getAsJsonArray("entries").get(1).getAsJsonObject().get("name");  // for gson
 
 // AFTER
 selector.findFirst(".entries[1].name");

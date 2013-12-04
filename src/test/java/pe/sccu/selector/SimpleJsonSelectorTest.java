@@ -11,8 +11,8 @@ import org.junit.Test;
 
 public class SimpleJsonSelectorTest {
 
-    private TreeNodeSelector selector;
     Object elem;
+    private TreeNodeSelector selector;
 
     @Before
     public void before() {
@@ -23,7 +23,8 @@ public class SimpleJsonSelectorTest {
 
     @Test
     public void testFind() {
-        ((JSONObject) ((JSONArray) ((JSONObject) elem).get("entries")).get(1)).get("name");
+        assertEquals(((JSONObject) ((JSONArray) ((JSONObject) elem).get("entries")).get(1)).get("name"),
+                selector.findFirst(".entries[1].name").toString());
         assertEquals("Bill", selector.findFirst(".entries[1].name").toString());
         assertEquals("26", selector.findFirst(".entries[1].age").toString());
     }

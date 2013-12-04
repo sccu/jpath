@@ -12,11 +12,12 @@ import com.google.gson.JsonElement;
 public class GsonSelectorTest {
 
     private TreeNodeSelector<JsonElement> selector;
+    private JsonElement elem;
 
     @Before
     public void before() {
         Gson gson = new GsonBuilder().create();
-        JsonElement elem = gson.fromJson(
+        elem = gson.fromJson(
                 "{entries: [{ pe.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
         selector = TreeNodeSelector.create(elem, true, new GsonNodeAccessor());
@@ -24,6 +25,8 @@ public class GsonSelectorTest {
 
     @Test
     public void testFind() {
+        assertEquals(elem.getAsJsonObject().getAsJsonArray("entries").get(1).getAsJsonObject().get("name"),
+                selector.findFirst(".entries[1].name"));
         assertEquals("Bill", selector.findFirst(".entries[1].name").getAsString());
         assertEquals(26, selector.findFirst(".entries[1].age").getAsInt());
     }
