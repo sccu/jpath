@@ -1,9 +1,9 @@
-AbstractTreeSelector
+jPath
 =====
 
-Jpath is - like jQuery - a node selector in tree-like structure.
+jPath is a node selector in json object.
 
-* You can use it with JSON, XML, YAML or built-in Map and List classes.
+* You can use it with JSON, YAML or built-in Map and List classes. You can use it with XML, but don't need to.
 * Do not parse data again. It works with parsed tree objects.
 
 Using with org.json.simple:
