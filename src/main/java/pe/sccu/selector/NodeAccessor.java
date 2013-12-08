@@ -1,7 +1,6 @@
 package pe.sccu.selector;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public interface NodeAccessor<E> {
@@ -11,5 +10,5 @@ public interface NodeAccessor<E> {
 
     Collection<Map.Entry<String, E>> getAllMembers(E element);
 
-    List<E> getAllArrayElements(E element);
+    Collection<E> getAllArrayElements(E element);
 }

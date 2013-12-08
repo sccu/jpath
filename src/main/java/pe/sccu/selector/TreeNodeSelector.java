@@ -9,13 +9,14 @@ import com.google.common.collect.Lists;
 public class TreeNodeSelector<E> {
 
     private final E element;
-    private final boolean throwExceptionWhenNotFound;
     private final NodeAccessor<E> nodeAccessor;
+    private final boolean throwExceptionWhenNotFound;
 
     private TreeNodeSelector(E element, boolean throwExceptionWhenNotFound, NodeAccessor<E> nodeAccessor) {
         this.element = element;
-        this.nodeAccessor = nodeAccessor;
         this.throwExceptionWhenNotFound = throwExceptionWhenNotFound;
+        this.nodeAccessor = throwExceptionWhenNotFound ? new ThrowableNodeAccessor<E>(nodeAccessor) : new ExceptionSafeNodeAccessor(
+                nodeAccessor);
     }
 
     public static <E> TreeNodeSelector<E> create(E element) {
@@ -36,47 +37,24 @@ public class TreeNodeSelector<E> {
     }
 
     public E findFirst(String path) {
-        try {
-            List<E> result = findElements(Lists.newArrayList(element), path, 0);
-            if (result == null || result.isEmpty()) {
-                throw new NodesNotFoundException(path);
-            }
-            return result.get(0);
-        } catch (IndexOutOfBoundsException e) {
-            if (throwExceptionWhenNotFound) {
-                throw new NodesNotFoundException(path, e);
-            } else {
-                return null;
-            }
-        } catch (NodesNotFoundException e) {
+        List<E> candidates = findElements(Lists.newArrayList(element), path, 0);
+        if (candidates.isEmpty()) {
             if (throwExceptionWhenNotFound) {
                 throw new NodesNotFoundException(path);
             } else {
                 return null;
             }
+        } else {
+            return candidates.get(0);
         }
     }
 
     public List<E> findAll(String path) {
-        try {
-            List<E> result = findElements(Lists.newArrayList(element), path, 0);
-            if (result == null || result.isEmpty()) {
-                throw new NodesNotFoundException(path);
-            }
-            return result;
-        } catch (IndexOutOfBoundsException e) {
-            if (throwExceptionWhenNotFound) {
-                throw e;
-            } else {
-                return null;
-            }
-        } catch (NodesNotFoundException e) {
-            if (throwExceptionWhenNotFound) {
-                throw e;
-            } else {
-                return null;
-            }
+        List<E> candidates = findElements(Lists.newArrayList(element), path, 0);
+        if (candidates.isEmpty() && throwExceptionWhenNotFound) {
+            throw new NodesNotFoundException(path);
         }
+        return candidates;
     }
 
     private List<E> findElements(List<E> elements, String path, int endIndex) {
@@ -120,7 +98,7 @@ public class TreeNodeSelector<E> {
     private List<E> getMatchedArrayElements(List<E> elements, String indexPattern) {
         List<E> candidates = Lists.newArrayList();
         for (E element : elements) {
-            List<E> children = nodeAccessor.getAllArrayElements(element);
+            Collection<E> children = nodeAccessor.getAllArrayElements(element);
             for (E child : children) {
                 if (child != null) {
                     if ("*".equals(indexPattern)) {
