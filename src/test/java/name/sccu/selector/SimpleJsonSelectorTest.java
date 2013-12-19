@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -17,7 +17,7 @@ public class SimpleJsonSelectorTest {
     @Before
     public void before() {
         elem = JSONValue
-                .parse("{\"entries\": [{ \"pe.sccu\":\"selector\", \"name\":\"Steve\" }, {\"name\":\"Bill\", \"age\":26}]}");
+                .parse("{\"entries\": [{ \"name.sccu\":\"selector\", \"name\":\"Steve\" }, {\"name\":\"Bill\", \"age\":26}]}");
         selector = TreeNodeSelector.create(elem, true);
     }
 
@@ -42,12 +42,13 @@ public class SimpleJsonSelectorTest {
 
     @Test
     public void testFindWithKeyIncludingDot() {
-        assertEquals("selector", selector.findFirst(".entries[0].pe\\.sccu").toString());
+        assertEquals("selector", selector.findFirst(".entries[0].name\\.sccu").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
-        Object elem = JSONValue.parse("{\"entries\": [{ \"pe.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
+        Object elem = JSONValue
+                .parse("{\"entries\": [{ \"name.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
         TreeNodeSelector aTree = TreeNodeSelector.create(elem);
         assertNull(aTree.findFirst(".entry"));
         assertNull(aTree.findFirst(".entries[2]"));

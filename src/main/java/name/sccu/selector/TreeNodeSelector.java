@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 import java.util.Collection;
 import java.util.List;

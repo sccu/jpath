@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -34,7 +34,7 @@ public class XmlSelectorTest {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new InputSource(new StringReader(
                 "<doc>"
-                        + "<entries><pe.sccu>selector</pe.sccu><name>Steve</name></entries>"
+                        + "<entries><name.sccu>selector</name.sccu><name>Steve</name></entries>"
                         + "<entries><name>Bill</name><age>26</age></entries>"
                         + "</doc>")));
 
@@ -114,7 +114,7 @@ public class XmlSelectorTest {
 
     @Test
     public void testFindWithKeyIncludingDot() {
-        assertEquals("selector", selector.findFirst(".doc[0].pe\\.sccu").getTextContent());
+        assertEquals("selector", selector.findFirst(".doc[0].name\\.sccu").getTextContent());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -123,7 +123,7 @@ public class XmlSelectorTest {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new InputSource(new StringReader(
                 "<doc>"
-                        + "<entries><pe.sccu>selector</pe.sccu><name>Steve</name></entries>"
+                        + "<entries><name.sccu>selector</name.sccu><name>Steve</name></entries>"
                         + "<entries><name>Bill</name><age>26</age></entries>"
                         + "</doc>")));
         TreeNodeSelector aTree = TreeNodeSelector.create(document);

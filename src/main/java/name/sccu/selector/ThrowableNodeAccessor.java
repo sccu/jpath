@@ -1,12 +1,8 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 import java.util.Collection;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA. User: sccu Date: 2013. 12. 7. Time: 7:32 To change this template use File | Settings |
- * File Templates.
- */
 public class ThrowableNodeAccessor<E> implements NodeAccessor<E> {
     private final NodeAccessor<E> nodeAccessor;
 

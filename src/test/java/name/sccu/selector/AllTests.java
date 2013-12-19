@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 class SelectorToken {
     private final Type type;

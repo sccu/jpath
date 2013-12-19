@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +18,7 @@ public class GsonSelectorTest {
     public void before() {
         Gson gson = new GsonBuilder().create();
         elem = gson.fromJson(
-                "{entries: [{ pe.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
+                "{entries: [{ name.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
         selector = TreeNodeSelector.create(elem, true, new GsonNodeAccessor());
     }
@@ -48,13 +48,13 @@ public class GsonSelectorTest {
 
     @Test
     public void testFindWithKeyIncludingDot() {
-        assertEquals("selector", selector.findFirst(".entries[0].pe\\.sccu").getAsString());
+        assertEquals("selector", selector.findFirst(".entries[0].name\\.sccu").getAsString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
         Gson gson = new GsonBuilder().create();
-        JsonElement elem = gson.fromJson("{entries: [{ pe.sccu:\"selector\" }, {name:\"Bill\", age:26}]}",
+        JsonElement elem = gson.fromJson("{entries: [{ name.sccu:\"selector\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
         TreeNodeSelector<JsonElement> aSelector = TreeNodeSelector.create(elem, new GsonNodeAccessor());
         assertNull(aSelector.findFirst(".entry"));

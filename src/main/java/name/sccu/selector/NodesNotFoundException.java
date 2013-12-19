@@ -1,4 +1,4 @@
-package pe.sccu.selector;
+package name.sccu.selector;
 
 public class NodesNotFoundException extends RuntimeException {
     private final String path;
