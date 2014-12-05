@@ -1,10 +1,11 @@
 jPath
 =====
 
-jPath is a node selector in json object.
+jPath is a node selector for JSON and tree-like data structures.
 
-* You can use it on JSON, YAML or built-in Map and List classes. (With XML, it works but not much useful.)
-* Do not parse data again. It works with parsed tree objects.
+* You can use jPath for JSON, YAML or built-in Map and List classes. (It works with XML, but not much useful.)
+* It saves your typing and time, when you want to access to and test the nodes of tree-like objects.
+* Do not parse data again. It works with already used tree-like objects.
 
 ```java
 // BEFORE
