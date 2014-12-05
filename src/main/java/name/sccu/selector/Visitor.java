@@ -3,7 +3,7 @@ package name.sccu.selector;
 import java.util.Collection;
 import java.util.Map;
 
-public interface NodeAccessor<E> {
+public interface Visitor<E> {
     E getByName(E element, String name);
 
     E getByIndex(E element, int index);

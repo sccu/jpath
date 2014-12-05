@@ -3,17 +3,17 @@ package name.sccu.selector;
 import java.util.Collection;
 import java.util.Map;
 
-public class ThrowableNodeAccessor<E> implements NodeAccessor<E> {
-    private final NodeAccessor<E> nodeAccessor;
+public class ThrowableVisitor<E> implements Visitor<E> {
+    private final Visitor<E> visitor;
 
-    public ThrowableNodeAccessor(NodeAccessor<E> nodeAccessor) {
-        this.nodeAccessor = nodeAccessor;
+    public ThrowableVisitor(Visitor<E> visitor) {
+        this.visitor = visitor;
     }
 
     @Override
     public E getByName(E element, String name) {
         try {
-            return nodeAccessor.getByName(element, name);
+            return visitor.getByName(element, name);
         } catch (Exception e) {
             throw new NodesNotFoundException("No such member name:" + name);
         }
@@ -22,7 +22,7 @@ public class ThrowableNodeAccessor<E> implements NodeAccessor<E> {
     @Override
     public E getByIndex(E element, int index) {
         try {
-            return nodeAccessor.getByIndex(element, index);
+            return visitor.getByIndex(element, index);
         } catch (Exception e) {
             throw new NodesNotFoundException("Invalid index:" + index);
         }
@@ -31,7 +31,7 @@ public class ThrowableNodeAccessor<E> implements NodeAccessor<E> {
     @Override
     public Collection<Map.Entry<String, E>> getAllMembers(E element) {
         try {
-            return nodeAccessor.getAllMembers(element);
+            return visitor.getAllMembers(element);
         } catch (Exception e) {
             throw new NodesNotFoundException("Failded to get members of " + element);
         }
@@ -40,7 +40,7 @@ public class ThrowableNodeAccessor<E> implements NodeAccessor<E> {
     @Override
     public Collection<E> getAllArrayElements(E element) {
         try {
-            return nodeAccessor.getAllArrayElements(element);
+            return visitor.getAllArrayElements(element);
         } catch (Exception e) {
             throw new NodesNotFoundException("Failded to get members of " + element);
         }

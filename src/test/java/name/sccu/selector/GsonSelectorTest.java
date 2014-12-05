@@ -11,7 +11,7 @@ import com.google.gson.JsonElement;
 
 public class GsonSelectorTest {
 
-    private TreeNodeSelector<JsonElement> selector;
+    private Selector<JsonElement> selector;
     private JsonElement elem;
 
     @Before
@@ -20,7 +20,10 @@ public class GsonSelectorTest {
         elem = gson.fromJson(
                 "{entries: [{ name.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
-        selector = TreeNodeSelector.create(elem, true, new GsonNodeAccessor());
+        selector = Selector
+                .builderOf(elem)
+                .withVisitor(new GsonVisitor())
+                .create();
     }
 
     @Test
@@ -56,7 +59,11 @@ public class GsonSelectorTest {
         Gson gson = new GsonBuilder().create();
         JsonElement elem = gson.fromJson("{entries: [{ name.sccu:\"selector\" }, {name:\"Bill\", age:26}]}",
                 JsonElement.class);
-        TreeNodeSelector<JsonElement> aSelector = TreeNodeSelector.create(elem, new GsonNodeAccessor());
+        Selector<JsonElement> aSelector = Selector
+                .builderOf(elem)
+                .suppressExceptions()
+                .withVisitor(new GsonVisitor())
+                .create();
         assertNull(aSelector.findFirst(".entry"));
         assertNull(aSelector.findFirst(".entries[2]"));
         assertNull(aSelector.findFirst(".entries[1].gender"));
@@ -77,6 +84,7 @@ public class GsonSelectorTest {
     public void testNodesNotFoundException() {
         String eMessage = null;
         try {
+            selector.findFirst(".entries[1].gender");
             selector.findFirst(".entries[1].gender");
         } catch (NodesNotFoundException e) {
             eMessage = e.getMessage();

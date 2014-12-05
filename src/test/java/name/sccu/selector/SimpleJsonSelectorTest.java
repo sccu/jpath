@@ -12,13 +12,13 @@ import org.junit.Test;
 public class SimpleJsonSelectorTest {
 
     Object elem;
-    private TreeNodeSelector selector;
+    private Selector selector;
 
     @Before
     public void before() {
         elem = JSONValue
                 .parse("{\"entries\": [{ \"name.sccu\":\"selector\", \"name\":\"Steve\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        selector = TreeNodeSelector.create(elem, true);
+        selector = Selector.builderOf(elem).create();
     }
 
     @Test
@@ -49,7 +49,7 @@ public class SimpleJsonSelectorTest {
     public void testWhenNotFound() {
         Object elem = JSONValue
                 .parse("{\"entries\": [{ \"name.sccu\":\"selector\" }, {\"name\":\"Bill\", \"age\":26}]}");
-        TreeNodeSelector aTree = TreeNodeSelector.create(elem);
+        Selector aTree = Selector.builderOf(elem).suppressExceptions().create();
         assertNull(aTree.findFirst(".entry"));
         assertNull(aTree.findFirst(".entries[2]"));
         assertNull(aTree.findFirst(".entries[1].gender"));

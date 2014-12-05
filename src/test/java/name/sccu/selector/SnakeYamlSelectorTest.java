@@ -11,11 +11,12 @@ import org.yaml.snakeyaml.Yaml;
 
 public class SnakeYamlSelectorTest {
 
-    private TreeNodeSelector selector;
+    private Selector selector;
 
     @Before
     public void before() {
         Yaml yaml = new Yaml();
+        @SuppressWarnings("unchecked")
         Map<String, Object> doc = (Map<String, Object>) yaml.load(
                 "# yaml 형식\n" +
                         "cosmos:\n" +
@@ -27,7 +28,7 @@ public class SnakeYamlSelectorTest {
                         "            #host: 1.234.567.89\n" +
                         "            host: localhost"
                 );
-        selector = TreeNodeSelector.create(doc, true);
+        selector = Selector.builderOf(doc).create();
     }
 
     @Test
@@ -53,6 +54,7 @@ public class SnakeYamlSelectorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testWhenNotFound() {
         Yaml yaml = new Yaml();
+        @SuppressWarnings("unchecked")
         Map<String, Object> doc = (Map<String, Object>) yaml.load(
                 "# yaml 형식\n" +
                         "cosmos:\n" +
@@ -64,7 +66,7 @@ public class SnakeYamlSelectorTest {
                         "            #host: 1.234.567.89\n" +
                         "            host: localhost"
                 );
-        TreeNodeSelector aTree = TreeNodeSelector.create(doc);
+        Selector aTree = Selector.builderOf(doc).suppressExceptions().create();
         assertNull(aTree.findFirst(".entry"));
         assertNull(aTree.findFirst(".entries[2]"));
         assertNull(aTree.findFirst(".entries[1].gender"));

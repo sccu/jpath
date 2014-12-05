@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 
-public class DefaultNodeAccessor<E> implements NodeAccessor<E> {
+public class DefaultVisitor<E> implements Visitor<E> {
     @Override
     public E getByName(E element, String name) {
         if (element instanceof Map) {

@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 
 public class XmlSelectorTest {
 
-    private TreeNodeSelector<Node> selector;
+    private Selector<? extends Node> selector;
 
     @Before
     public void before() throws ParserConfigurationException, IOException, SAXException {
@@ -38,7 +38,7 @@ public class XmlSelectorTest {
                         + "<entries><name>Bill</name><age>26</age></entries>"
                         + "</doc>")));
 
-        selector = TreeNodeSelector.create(document, true, new DefaultNodeAccessor<Node>() {
+        DefaultVisitor<Node> visitor = new DefaultVisitor<Node>() {
             @Override
             public Node getByIndex(Node element, int index) {
                 return element.getChildNodes().item(index);
@@ -91,7 +91,8 @@ public class XmlSelectorTest {
                 }
                 return list;
             }
-        });
+        };
+        selector = Selector.builderOf(document).withVisitor(visitor).create();
     }
 
     @Test
@@ -126,7 +127,7 @@ public class XmlSelectorTest {
                         + "<entries><name.sccu>selector</name.sccu><name>Steve</name></entries>"
                         + "<entries><name>Bill</name><age>26</age></entries>"
                         + "</doc>")));
-        TreeNodeSelector aTree = TreeNodeSelector.create(document);
+        Selector aTree = Selector.builderOf(document).suppressExceptions().create();
         assertNull(aTree.findFirst(".docs"));
         assertNull(aTree.findFirst(".doc[2]"));
         assertNull(aTree.findFirst(".doc[1].gender"));

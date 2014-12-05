@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 
-public class GsonNodeAccessor extends DefaultNodeAccessor<JsonElement> {
+public class GsonVisitor extends DefaultVisitor<JsonElement> {
 
     @Override
     public JsonElement getByName(JsonElement element, String name) {
