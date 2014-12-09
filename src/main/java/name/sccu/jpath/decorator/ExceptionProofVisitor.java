@@ -1,12 +1,14 @@
-package name.sccu.selector;
+package name.sccu.jpath.decorator;
 
 import java.util.Collection;
 import java.util.Map;
 
-public class ThrowableVisitor<E> implements Visitor<E> {
+import name.sccu.jpath.Visitor;
+
+public class ExceptionProofVisitor<E> implements Visitor<E> {
     private final Visitor<E> visitor;
 
-    public ThrowableVisitor(Visitor<E> visitor) {
+    public ExceptionProofVisitor(Visitor<E> visitor) {
         this.visitor = visitor;
     }
 
@@ -15,7 +17,7 @@ public class ThrowableVisitor<E> implements Visitor<E> {
         try {
             return visitor.getByName(element, name);
         } catch (Exception e) {
-            throw new NodesNotFoundException("No such member name:" + name);
+            return null;
         }
     }
 
@@ -24,7 +26,7 @@ public class ThrowableVisitor<E> implements Visitor<E> {
         try {
             return visitor.getByIndex(element, index);
         } catch (Exception e) {
-            throw new NodesNotFoundException("Invalid index:" + index);
+            return null;
         }
     }
 
@@ -33,7 +35,7 @@ public class ThrowableVisitor<E> implements Visitor<E> {
         try {
             return visitor.getAllMembers(element);
         } catch (Exception e) {
-            throw new NodesNotFoundException("Failded to get members of " + element);
+            return null;
         }
     }
 
@@ -42,7 +44,7 @@ public class ThrowableVisitor<E> implements Visitor<E> {
         try {
             return visitor.getAllArrayElements(element);
         } catch (Exception e) {
-            throw new NodesNotFoundException("Failded to get members of " + element);
+            return null;
         }
     }
 }

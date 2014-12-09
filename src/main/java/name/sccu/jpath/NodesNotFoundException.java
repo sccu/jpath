@@ -1,4 +1,4 @@
-package name.sccu.selector;
+package name.sccu.jpath;
 
 public class NodesNotFoundException extends RuntimeException {
     private final String path;

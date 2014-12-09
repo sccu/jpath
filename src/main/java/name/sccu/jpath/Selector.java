@@ -1,8 +1,11 @@
-package name.sccu.selector;
+package name.sccu.jpath;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import name.sccu.jpath.decorator.ExceptionProofVisitor;
+import name.sccu.jpath.decorator.ThrowableVisitor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

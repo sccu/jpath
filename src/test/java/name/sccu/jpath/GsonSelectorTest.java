@@ -1,4 +1,4 @@
-package name.sccu.selector;
+package name.sccu.jpath;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +18,8 @@ public class GsonSelectorTest {
     public void before() {
         Gson gson = new GsonBuilder().create();
         elem = gson.fromJson(
-                "{entries: [{ name.sccu:\"selector\", name:\"Steve\" }, {name:\"Bill\", age:26}]}",
+                "{entries: [{ name.sccu:\"selector\", name:\"Steve\", \"full_name\":\"Steve Jobs\"}," +
+                        "{name:\"Bill\", age:26, \"[elevated.forced_prop]\":true}]}",
                 JsonElement.class);
         selector = Selector
                 .builderOf(elem)
@@ -50,8 +51,10 @@ public class GsonSelectorTest {
     }
 
     @Test
-    public void testFindWithKeyIncludingDot() {
+    public void testFindWithKeysIncludingSpecialCharacters() {
         assertEquals("selector", selector.findFirst(".entries[0].name\\.sccu").getAsString());
+        assertEquals("Steve Jobs", selector.findFirst(".entries[0].full_name").getAsString());
+        assertTrue(selector.findFirst(".entries[1].\\[elevated\\.forced_prop\\]").getAsBoolean());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -76,8 +79,8 @@ public class GsonSelectorTest {
     public void testFindAll() {
         assertEquals(2, selector.findAll(".entries[*].name").size());
         assertEquals(1, selector.findAll(".entries[*].age").size());
-        assertEquals(2, selector.findAll(".entries[1].*").size());
-        assertEquals(4, selector.findAll(".entries[*].*").size());
+        assertEquals(3, selector.findAll(".entries[1].*").size());
+        assertEquals(6, selector.findAll(".entries[*].*").size());
     }
 
     @Test

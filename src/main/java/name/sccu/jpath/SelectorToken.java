@@ -1,9 +1,10 @@
-package name.sccu.selector;
+package name.sccu.jpath;
 
 class SelectorToken {
     private final Type type;
     private final String data;
     private final int endIndex;
+    public static final String SPECIAL_CHARACTERS = "\\.[]*";
 
     private SelectorToken(Type type, String data, int endIndex) {
         this.type = type;
@@ -27,7 +28,7 @@ class SelectorToken {
                 }
                 break;
             case S1:
-                if (Character.isAlphabetic(lookahead)) {
+                if (SPECIAL_CHARACTERS.indexOf(lookahead) == -1) {
                     state = State.S2;
                 } else if (lookahead == '\\') {
                     state = State.S3;
@@ -38,7 +39,7 @@ class SelectorToken {
                 }
                 break;
             case S2:
-                if (Character.isAlphabetic(lookahead)) {
+                if (SPECIAL_CHARACTERS.indexOf(lookahead) == -1) {
                     state = State.S2;
                 } else if (lookahead == '\\') {
                     state = State.S3;
@@ -49,11 +50,7 @@ class SelectorToken {
                 }
                 break;
             case S3:
-                if (lookahead == '.') {
-                    state = State.S2;
-                } else {
-                    throw new IllegalArgumentException("Invalid character " + lookahead + " at position " + next);
-                }
+                state = State.S2;
                 break;
             case S4:
                 if (lookahead == '0') {
@@ -113,7 +110,13 @@ class SelectorToken {
         }
 
         if (state == State.S2) {
-            return new SelectorToken(Type.OBJECT, path.substring(start + 1, next).replace("\\", ""), next);
+            String key = path.substring(start + 1, next)
+                    .replace("\\\\", "\\")
+                    .replace("\\.", ".")
+                    .replace("\\*", "*")
+                    .replace("\\[", "[")
+                    .replace("\\]", "]");
+            return new SelectorToken(Type.OBJECT, key, next);
         } else if (state == State.S6) {
             return new SelectorToken(Type.ARRAY, path.substring(start + 1, next - 1), next);
         } else if (state == State.S9) {

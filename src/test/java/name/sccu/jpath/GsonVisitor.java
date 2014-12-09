@@ -1,4 +1,4 @@
-package name.sccu.selector;
+package name.sccu.jpath;
 
 import java.util.Collection;
 import java.util.Map;
