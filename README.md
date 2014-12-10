@@ -61,4 +61,4 @@ assertEquals(4, selector.findAll(".entries[*].*").size());
 
 ##Maven Dependency
 jpath is not currently deployed to the maven central. But you can configure in-project repo in the pom.xml.
-Refer to [here](https://devcenter.heroku.com/articles/local-maven-dependencies)
+Refer to [this](https://devcenter.heroku.com/articles/local-maven-dependencies)
