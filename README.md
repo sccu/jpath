@@ -7,7 +7,7 @@ jpath is a node selector for JSON and tree-like data structures.
 * Do not parse data again. jpath use already parsed objects.
 * Especially useful for unit testing of JSON or REST APIs. 
 
-BEFORE vs. AFTER
+##Usage
 ```java
 // BEFORE
 ((JSONObject)((JSONArray)((JSONObject) elem).get("entries")).get(1)).get("name");   // for org.json.simple
@@ -58,3 +58,7 @@ assertEquals(1, selector.findAll(".entries[*].age").size());
 assertEquals(2, selector.findAll(".entries[1].*").size());
 assertEquals(4, selector.findAll(".entries[*].*").size());
 ```
+
+##Maven Dependency
+jpath is not currently deployed to the maven central. But you can configure in-project repo in the pom.xml.
+Refer to [here](https://devcenter.heroku.com/articles/local-maven-dependencies)
